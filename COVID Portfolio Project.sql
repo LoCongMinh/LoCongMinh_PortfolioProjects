@@ -11,7 +11,7 @@ ALTER TABLE
 ADD 
 	DateConverted date --- Data type is date
 
----
+
 SELECT 
 	DateConverted
 FROM
@@ -20,7 +20,7 @@ FROM
 
 --- Convert date to normal format
 
-
+	
 UPDATE 
 	PortfolioProject.dbo.fulldata
 SET
@@ -31,10 +31,10 @@ SET
 
 
 SELECT		continent, location, ConvertedDate, population, total_cases, total_deaths,
-			((total_deaths/total_cases)*100) AS DeathPercentage
+		((total_deaths/total_cases)*100) AS DeathPercentage
 FROM		PortfolioProject..Covidfulldata
 WHERE		location = 'United States'
-			AND ConvertedDate >= '2024-01-01'
+	AND 	ConvertedDate >= '2024-01-01'
 ORDER BY	ConvertedDate
 
 
@@ -42,10 +42,10 @@ ORDER BY	ConvertedDate
 
 
 SELECT		continent, location, ConvertedDate, population, total_cases, 
-			((total_cases/population)*100) AS ExposeRate
+		((total_cases/population)*100) AS ExposeRate
 FROM		PortfolioProject..Covidfulldata
 WHERE		location = 'Vietnam'
-			AND ConvertedDate >= '2024-01-01'
+	AND 	ConvertedDate >= '2024-01-01'
 ORDER BY	ConvertedDate
 
 
@@ -58,8 +58,8 @@ SELECT
 	MAX(total_cases) AS HighestCovidCases, 
 	(MAX(total_cases)/population*100) AS HighestExposeRate
 FROM
-PortfolioProject..Covidfulldata
-WHERE		continent IS NOT NULL --- In our full data there is line grouped by a whole continent
+	PortfolioProject..Covidfulldata
+WHERE		continent IS NOT NULL --- In our full data there is rows grouped by a whole continent (try continent is NULL for more info)
 GROUP BY	continent, location, population
 ORDER BY	HighestExposeRate DESC
 
@@ -68,14 +68,14 @@ ORDER BY	HighestExposeRate DESC
 
 
 SELECT
-	continent,
-	location,
-	population,
-	MAX(total_deaths) AS HighestDeathCount, 
-	MAX(total_deaths)/population*100 AS DeathPercentage
+		continent,
+		location,
+		population,
+		MAX(total_deaths) AS HighestDeathCount, 
+		MAX(total_deaths)/population*100 AS DeathPercentage
 FROM
-	PortfolioProject..Covidfulldata
-WHERE		continent IS NOT NULL --- In our full data there is line grouped by a whole continent
+		PortfolioProject..Covidfulldata
+WHERE		continent IS NOT NULL --- In our full data there is rows grouped by a whole continent (try continent is NULL for more info)
 GROUP BY	continent, location, population
 ORDER BY	HighestDeathCount DESC
 
@@ -106,36 +106,39 @@ ORDER BY	TotalDeathPercentage DESC
 -- Looking at total population vs vaccination
 
 SELECT
-		continent,
-		location,
-		ConvertedDate,
-		population,
-		new_vaccinations,
-		SUM(CAST(new_vaccinations AS BIGINT)) OVER (PARTITION BY location ORDER BY location, ConvertedDate) AS VaccinatedCumulative
+	continent,
+	location,
+	ConvertedDate,
+	population,
+	new_vaccinations,
+	SUM(CAST(new_vaccinations AS BIGINT)) OVER (PARTITION BY location ORDER BY location, ConvertedDate) AS VaccinatedCumulative
 FROM	PortfolioProject..Covidfulldata
 WHERE	continent IS NOT NULL
 
 
 -- Adding CTE to calculate Vaccinated vs Population % 
 
+	
 WITH VacvsPop (continent, location, ConvertedDate, population, new_vaccinations, VaccinatedCumulative)
 AS (
 SELECT
-		continent,
-		location,
-		ConvertedDate,
-		population,
-		new_vaccinations,
-		SUM(CAST(new_vaccinations AS BIGINT)) OVER (PARTITION BY location ORDER BY location, ConvertedDate) AS VaccinatedCumulative
+	continent,
+	location,
+	ConvertedDate,
+	population,
+	new_vaccinations,
+	SUM(CAST(new_vaccinations AS BIGINT)) OVER (PARTITION BY location ORDER BY location, ConvertedDate) AS VaccinatedCumulative
 FROM	PortfolioProject..Covidfulldata
 WHERE	continent IS NOT NULL
 )
+
 SELECT *, (VaccinatedCumulative/population)*100 AS VaccinatedPercentageCummulative
 FROM VacvsPop
 
 
--- Create Temp Table
+--- Create Temp Table
 
+	
 DROP TABLE if exists #PercentPopulationVaccinated
 
 CREATE TABLE #PercentPopulationVaccinated (
