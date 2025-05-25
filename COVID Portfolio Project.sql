@@ -31,10 +31,10 @@ SET
 
 
 SELECT		continent, location, ConvertedDate, population, total_cases, total_deaths,
-		((total_deaths/total_cases)*100) AS DeathPercentage
+		CONCAT(ROUND(((total_deaths / total_cases)*100),2), '%') AS DeathPercentage
 FROM		PortfolioProject..Covidfulldata
 WHERE		location = 'United States'
-	AND 	ConvertedDate >= '2024-01-01'
+		AND ConvertedDate >= '2024-01-01'
 ORDER BY	ConvertedDate
 
 
@@ -42,10 +42,10 @@ ORDER BY	ConvertedDate
 
 
 SELECT		continent, location, ConvertedDate, population, total_cases, 
-		((total_cases/population)*100) AS ExposeRate
+		CONCAT(ROUND(((total_cases/population)*100),2), '%') AS ExposeRate
 FROM		PortfolioProject..Covidfulldata
 WHERE		location = 'Vietnam'
-	AND 	ConvertedDate >= '2024-01-01'
+		AND ConvertedDate >= '2024-01-01'
 ORDER BY	ConvertedDate
 
 
@@ -56,10 +56,10 @@ SELECT
 	location, 
 	population,
 	MAX(total_cases) AS HighestCovidCases, 
-	(MAX(total_cases)/population*100) AS HighestExposeRate
+	ROUND((MAX(total_cases)/population*100),2) AS HighestExposeRate
 FROM
-	PortfolioProject..Covidfulldata
-WHERE		continent IS NOT NULL --- In our full data there is rows grouped by a whole continent (try continent is NULL for more info)
+PortfolioProject..Covidfulldata
+WHERE		continent IS NOT NULL --- In our full data there is line grouped by a whole continent
 GROUP BY	continent, location, population
 ORDER BY	HighestExposeRate DESC
 
@@ -68,14 +68,14 @@ ORDER BY	HighestExposeRate DESC
 
 
 SELECT
-		continent,
-		location,
-		population,
-		MAX(total_deaths) AS HighestDeathCount, 
-		MAX(total_deaths)/population*100 AS DeathPercentage
+	continent,
+	location,
+	population,
+	MAX(total_deaths) AS HighestDeathCount, 
+	ROUND((MAX(total_deaths)/population*100),2) AS DeathPercentage
 FROM
-		PortfolioProject..Covidfulldata
-WHERE		continent IS NOT NULL --- In our full data there is rows grouped by a whole continent (try continent is NULL for more info)
+	PortfolioProject..Covidfulldata
+WHERE		continent IS NOT NULL --- In our full data there is line grouped by a whole continent
 GROUP BY	continent, location, population
 ORDER BY	HighestDeathCount DESC
 
@@ -97,10 +97,9 @@ ORDER BY	HighestDeathCount DESC
 SELECT		
 	SUM(new_cases) AS TOTAL_CASES, 
 	SUM(new_deaths) AS TOTAL_DEATHS,
-	SUM(new_deaths)/SUM(new_cases)*100 AS TotalDeathPercentage
+	CONCAT(ROUND((SUM(new_deaths)/SUM(new_cases)*100),2),'%') AS TotalDeathPercentage
 FROM		PortfolioProject..Covidfulldata
 WHERE		continent IS NOT NULL
-ORDER BY	TotalDeathPercentage DESC
 
 
 -- Looking at total population vs vaccination
